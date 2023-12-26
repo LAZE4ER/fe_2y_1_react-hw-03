@@ -1,60 +1,48 @@
-import { nanoid } from "nanoid";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import ContactForm from "./components/ContactForm";
+import ContactsList from "./components/ContactsList";
+import Searchbar from "./components/Searchbar";
 import {
-  Container,
-  Typography,
-  Paper,
-  TextField,
-  Button,
-  Stack,
-} from "@mui/material";
-import ContactList from "./components/ContactList";
-import CreateContactForm from "./components/CreateContactForm";
+  addContactAction,
+  deleteContactAction,
+} from "./redux/contacts/contactsActions";
+import { useDispatch, useSelector } from "react-redux";
+import { nanoid } from "@reduxjs/toolkit";
+import { selectContacts } from "./redux/contacts/contactSelector";
 function App() {
-  const [contacts, setContacts] = useState([]);
-  const [name, setName] = useState("");
-  const [number, setNumber] = useState("");
+  const contacts = useSelector(selectContacts);
   const [filter, setFilter] = useState("");
-
-  function createContact() {
+  const dispatch = useDispatch();
+  function createContact(name, number) {
     const newContact = {
       name: name,
       id: nanoid(),
       number: number,
     };
-    setContacts((prevContacts) => [newContact, ...prevContacts]);
+
+    dispatch(addContactAction(newContact));
   }
-  function removeContact() {
-    setContacts((prevContacts) =>
-      prevContacts.filter((contact) => contact.id !== id)
-    );
-  }
+  function removeContact() {}
   function handleSubmit(e) {
     e.preventDefault();
     createContact();
   }
-  function filterContacts() {
-    const filteredContacts = contacts.filter((contact) => {
-      return contact.name.includes(filter);
-    });
-    return filteredContacts;
-  }
+  const filteredContacts = contacts.filter((contact) => {
+    return contact.name.includes(filter);
+  });
 
   return (
-    <Container>
-      <Typography variant="h3">Phonebook</Typography>
-      <Paper
-        elevation={5}
-        sx={{
-          padding: "18px",
-        }}
-      >
-        <ContactList contacts={filterContacts()} />
-        <CreateContactForm />
-        <h1>Find contacts by name</h1>
-        <TextField type="text" onChange={(e) => setFilter(e.target.value)} />
-      </Paper>
-    </Container>
+    <div>
+      <h2>Phonebook</h2>
+      <ContactForm onCreate={createContact} />
+      <br />
+
+      <h2>Contacts</h2>
+
+      <Searchbar />
+
+      <ContactsList contacts={filteredContacts} onDelete={removeContact} />
+    </div>
   );
 }
 
