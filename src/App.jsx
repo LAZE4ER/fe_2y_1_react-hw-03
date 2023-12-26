@@ -22,7 +22,9 @@ function App() {
 
     dispatch(addContactAction(newContact));
   }
-  function removeContact() {}
+  function removeContact(contact) {
+    dispatch(deleteContactAction(contact));
+  }
   function handleSubmit(e) {
     e.preventDefault();
     createContact();
